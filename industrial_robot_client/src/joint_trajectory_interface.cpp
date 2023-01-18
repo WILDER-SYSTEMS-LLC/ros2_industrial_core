@@ -29,6 +29,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <industrial_robot_client/industrial_robot_client_internal.h>
+
 #include <algorithm>
 #include "industrial_robot_client/joint_trajectory_interface.h"
 #include "simple_message/joint_traj_pt.h"

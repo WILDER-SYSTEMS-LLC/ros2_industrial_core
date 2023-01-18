@@ -29,6 +29,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <industrial_robot_client/industrial_robot_client_internal.h>
+
 #include "industrial_robot_client/joint_trajectory_streamer.h"
 
 using industrial::simple_message::SimpleMessage;
@@ -116,7 +118,7 @@ bool JointTrajectoryStreamer::send_to_robot(const std::vector<JointTrajPtMessage
     this->current_traj_ = messages;
     this->current_point_ = 0;
     this->state_ = TransferStates::STREAMING;
-    this->streaming_start_ = ros::Time::now();
+    this->streaming_start_ = rclcpp::Clock(RCL_ROS_TIME).now();
   }
   this->mutex_.unlock();
 

@@ -71,7 +71,7 @@ public:
   /**
      * \brief Begin processing messages and publishing topics.
      */
-    void run() { ros::spin(); }
+    void run() { rclcpp::spin(); }
 
 private:
 

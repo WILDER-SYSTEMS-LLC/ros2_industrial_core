@@ -122,7 +122,7 @@ public:
   /**
    * \brief Begin processing messages and publishing topics.
    */
-  virtual void run() { ros::spin(); }
+  virtual void run() { rclcpp::spin(); }
 
 protected:
 

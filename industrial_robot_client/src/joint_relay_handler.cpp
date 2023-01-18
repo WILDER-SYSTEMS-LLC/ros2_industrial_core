@@ -129,13 +129,13 @@ bool JointRelayHandler::create_messages(JointMessage& msg_in,
 
   // assign values to messages
   control_msgs::FollowJointTrajectoryFeedback tmp_control_state;  // always start with a "clean" message
-  tmp_control_state.header.stamp = ros::Time::now();
+  tmp_control_state.header.stamp = rclcpp::Clock(RCL_ROS_TIME).now();
   tmp_control_state.joint_names = pub_joint_names;
   tmp_control_state.actual.positions = pub_joint_pos;
   *control_state = tmp_control_state;
 
   sensor_msgs::JointState tmp_sensor_state;
-  tmp_sensor_state.header.stamp = ros::Time::now();
+  tmp_sensor_state.header.stamp = tmp_control_state.header.stamp;
   tmp_sensor_state.name = pub_joint_names;
   tmp_sensor_state.position = pub_joint_pos;
   *sensor_state = tmp_sensor_state;

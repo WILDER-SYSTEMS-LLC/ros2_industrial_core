@@ -46,7 +46,7 @@ namespace robot_status_relay_handler
 
 bool RobotStatusRelayHandler::init(SmplMsgConnection* connection)
 {
-  this->pub_robot_status_ = this->node_.advertise<industrial_msgs::RobotStatus>("robot_status", 1);
+  this->pub_robot_status_ = this->node_.advertise<industrial_msgs::msg::RobotStatus>("robot_status", 1);
   return init((int)StandardMsgTypes::STATUS, connection);
 }
 
@@ -65,10 +65,10 @@ bool RobotStatusRelayHandler::internalCB(SimpleMessage& in)
 
 bool RobotStatusRelayHandler::internalCB(RobotStatusMessage & in)
 {
-  industrial_msgs::RobotStatus status;
+	industrial_msgs::msg::RobotStatus status;
   bool rtn = true;
 
-  status.header.stamp = ros::Time::now();
+  status.header.stamp = rclcpp::Clock(RCL_ROS_TIME).now();
   status.drives_powered.val = TriStates::toROSMsgEnum(in.status_.getDrivesPowered());
   status.e_stopped.val = TriStates::toROSMsgEnum(in.status_.getEStopped());
   status.error_code = in.status_.getErrorCode();

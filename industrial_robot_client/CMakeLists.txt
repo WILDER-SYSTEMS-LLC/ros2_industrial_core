@@ -19,7 +19,8 @@ find_package(actionlib_msgs REQUIRED)
 
 find_package(Boost REQUIRED COMPONENTS system thread)
 
-include_directories(include)
+# Shouldnt this be handled by find_package?? Guess not.
+include_directories(include trajectory_msgs)
 
 
 set(SRC_FILES src/joint_relay_handler.cpp

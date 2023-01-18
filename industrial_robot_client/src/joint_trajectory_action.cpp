@@ -1,3 +1,4 @@
+#include <industrial_robot_client/industrial_robot_client_internal.h>
 /*
  * Software License Agreement (BSD License)
  *
@@ -28,6 +29,9 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+
+#include <industrial_robot_client/industrial_robot_client_internal.h>
+
 
 #include <industrial_robot_client/joint_trajectory_action.h>
 #include <industrial_robot_client/utils.h>
@@ -77,7 +81,7 @@ void JointTrajectoryAction::robotStatusCB(const industrial_msgs::RobotStatusCons
   has_moved_once_ = has_moved_once_ ? true : (last_robot_status_->in_motion.val == industrial_msgs::TriState::TRUE);
 }
 
-void JointTrajectoryAction::watchdog(const ros::TimerEvent &e)
+void JointTrajectoryAction::watchdog(const rclcpp::TimerEvent &e)
 {
   // Some debug logging
   if (!last_trajectory_state_)
@@ -138,7 +142,7 @@ void JointTrajectoryAction::goalCB(JointTractoryActionServer::GoalHandle gh)
       gh.setAccepted();
       active_goal_ = gh;
       has_active_goal_ = true;
-      time_to_check_ = ros::Time::now() +
+      time_to_check_ = rclcpp::Clock(RCL_ROS_TIME).now() +
           ros::Duration(active_goal_.getGoal()->trajectory.points.back().time_from_start.toSec() / 2.0);
       has_moved_once_ = false;
 
@@ -227,7 +231,7 @@ void JointTrajectoryAction::controllerStateCB(const control_msgs::FollowJointTra
     return;
   }
 
-  if (!has_moved_once_ && (ros::Time::now() < time_to_check_))
+  if (!has_moved_once_ && (rclcpp::Clock(RCL_ROS_TIME).now() < time_to_check_))
   {
     ROS_INFO_NAMED(name_, "Waiting to check for goal completion until halfway through trajectory");
     return;

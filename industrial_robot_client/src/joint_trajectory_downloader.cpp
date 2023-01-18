@@ -29,6 +29,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <industrial_robot_client/industrial_robot_client_internal.h>
+
 #include "industrial_robot_client/joint_trajectory_downloader.h"
 
 namespace industrial_robot_client
