@@ -33,47 +33,40 @@
 
 #include "industrial_utils/param_utils.h"
 #include "industrial_utils/utils.h"
-#include "ros/ros.h"
+//#include "ros/ros.h"
+#include "rclcpp/rclcpp.hpp"
+
+
+// This is cribbed from 
+// https://github.com/ros2/rclcpp/blob/rolling/rclcpp/test/rclcpp/test_logging.cpp
+
+#include "rclcpp/logging.hpp"
+rclcpp::Logger g_logger = rclcpp::get_logger("name");
+#define ROS_INFO_STREAM(x) RCLCPP_INFO_STREAM(g_logger,x)
+#define ROS_WARN_STREAM(x) RCLCPP_WARN_STREAM(g_logger,x)
+#define ROS_ERROR_STREAM(x) RCLCPP_ERROR_STREAM(g_logger,x)
+
 #include <urdf/urdfdom_compatibility.h>
 
 namespace industrial_utils
 {
 namespace param
 {
+	// Get value of named parameter if exists?
+	// Then push it onto the provided listt
 bool getListParam(const std::string param_name, std::vector<std::string> & list_param)
 {
   bool rtn = false;
-  XmlRpc::XmlRpcValue rpc_list;
+  rclcpp::Parameter value = this->get_parameter(param_name);
+  rtn = (value.get_type_name() == "std::string");
 
-  list_param.clear(); //clear out return value
 
-  rtn = ros::param::get(param_name, rpc_list);
+  //rtn = ros::param::get(param_name, rpc_list);
 
   if (rtn)
   {
-    rtn = (rpc_list.getType() == XmlRpc::XmlRpcValue::TypeArray);
-
-    if (rtn)
-    {
-
-      for (int i = 0; i < rpc_list.size(); ++i)
-      {
-        rtn = (rpc_list[i].getType() == XmlRpc::XmlRpcValue::TypeString);
-        if (rtn)
-        {
-          ROS_INFO_STREAM("Adding " << rpc_list[i] << " to list parameter");
-          list_param.push_back(static_cast<std::string>(rpc_list[i]));
-        }
-        else
-        {
-          ROS_ERROR_STREAM("List item for: " << param_name << " not of string type");
-        }
-      }
-    }
-    else
-    {
-      ROS_ERROR_STREAM("Parameter: " << param_name << " not of list type");
-    }
+    std::string my_str = value.as_string();
+    list_param.push_back(my_str);
   }
   else
   {
@@ -99,7 +92,8 @@ bool getJointNames(const std::string joint_list_param, const std::string urdf_pa
   joint_names.clear();
 
   // 1) Try to read explicit list of joint names
-  if (ros::param::has(joint_list_param) && getListParam(joint_list_param, joint_names))
+  if (// ros::param::has(joint_list_param) &&
+       getListParam(joint_list_param, joint_names))
   {
     ROS_INFO_STREAM("Found user-specified joint names in '" << joint_list_param << "': " << vec2str(joint_names));
     return true;
@@ -109,8 +103,9 @@ bool getJointNames(const std::string joint_list_param, const std::string urdf_pa
 
   // 2) Try to find joint names from URDF model
   urdf::Model model;
-  if ( ros::param::has(urdf_param)
-       && model.initParam(urdf_param)
+  if ( //ros::param::has(urdf_param)
+       //&& 
+       model.initParam(urdf_param)
        && findChainJointNames(model.getRoot(), true, joint_names) )
   {
     ROS_INFO_STREAM("Using joint names from URDF: '" << urdf_param << "': " << vec2str(joint_names));
@@ -131,7 +126,8 @@ bool getJointVelocityLimits(const std::string urdf_param_name, std::map<std::str
   urdf::Model model;
   std::map<std::string, urdf::JointSharedPtr >::iterator iter;
 
-  if (!ros::param::has(urdf_param_name) || !model.initParam(urdf_param_name))
+  if (//!ros::param::has(urdf_param_name) || 
+		  !model.initParam(urdf_param_name))
     return false;
     
   velocity_limits.clear();

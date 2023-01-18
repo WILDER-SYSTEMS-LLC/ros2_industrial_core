@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
-<package format="2">
+<package format="3">
   <name>industrial_utils</name>
   <version>0.7.3</version>
   <description>Industrial utils is a library package that captures common funcitonality for the ROS-Industrial distribution.</description>
@@ -10,10 +10,18 @@
   <license>BSD</license>
   <url type="website">http://ros.org/wiki/industrial_utils</url>
 
-  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>rosidl_default_generators</buildtool_depend>
+  <exec_depend>rosidl_default_runtime</exec_depend>
+  <member_of_group>rosidl_interface_packages</member_of_group>
 
-  <depend>roscpp</depend>
+
+  <depend>rclcpp</depend>
   <depend>urdf</depend>
 
   <test_depend>rosunit</test_depend>
+
+  <export>
+  <build_type>ament_cmake</build_type>
+  </export>
+
 </package>

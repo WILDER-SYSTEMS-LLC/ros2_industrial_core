@@ -30,8 +30,24 @@
  */
 
 #include "industrial_utils/utils.h"
-#include "ros/ros.h"
+//#include "ros/ros.h"
+#include "rclcpp/rclcpp.hpp"
+
+
 #include <algorithm>
+
+#define ROS_DEBUG RCUTILS_LOG_DEBUG
+#define ROS_ERROR RCUTILS_LOG_ERROR
+#define ROS_WARN RCUTILS_LOG_WARN
+#define ROS_INFO RCUTILS_LOG_INFO
+
+#include "rclcpp/logging.hpp"
+rclcpp::Logger g_logger = rclcpp::get_logger("name");
+#define ROS_DEBUG_STREAM(x) RCLCPP_DEBUG_STREAM(g_logger,x)
+#define ROS_INFO_STREAM(x) RCLCPP_INFO_STREAM(g_logger,x)
+#define ROS_WARN_STREAM(x) RCLCPP_WARN_STREAM(g_logger,x)
+#define ROS_ERROR_STREAM(x) RCLCPP_ERROR_STREAM(g_logger,x)
+
 
 namespace industrial_utils
 {
