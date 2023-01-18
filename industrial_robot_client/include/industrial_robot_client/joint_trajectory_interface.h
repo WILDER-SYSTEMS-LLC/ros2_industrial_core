@@ -251,7 +251,7 @@ protected:
 
   TcpClient default_tcp_connection_;
 
-  ros::NodeHandle node_;
+  std::shared_ptr<rclcpp::Node> node_;
   SmplMsgConnection* connection_;
   ros::Subscriber sub_cur_pos_;  // handle for joint-state topic subscription
   ros::Subscriber sub_joint_trajectory_; // handle for joint-trajectory topic subscription

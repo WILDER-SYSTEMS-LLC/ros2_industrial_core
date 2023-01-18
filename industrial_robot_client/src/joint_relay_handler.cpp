@@ -31,6 +31,7 @@
 
 #include <algorithm>
 
+#include "industrial_robot_client/industrial_robot_client_internal.h"
 #include "industrial_robot_client/joint_relay_handler.h"
 #include "simple_message/log_wrapper.h"
 
@@ -45,10 +46,11 @@ namespace joint_relay_handler
 
 bool JointRelayHandler::init(SmplMsgConnection* connection, std::vector<std::string>& joint_names)
 {
+  this->node_ = rclcpp::Node::make_shared("joint_relay_handler");
   this->pub_joint_control_state_ =
-          this->node_.advertise<control_msgs::FollowJointTrajectoryFeedback>("feedback_states", 1);
-
-  this->pub_joint_sensor_state_ = this->node_.advertise<sensor_msgs::JointState>("joint_states",1);
+          this->node_->create_publisher<control_msgs::action::FollowJointTrajectory_Feedback>("feedback_states", 1);
+  this->pub_joint_sensor_state_ = 
+	  this->node_->create_publisher<sensor_msgs::msg::JointState>("joint_states",1);
 
   // save "complete" joint-name list, preserving any blank entries for later use
   this->all_joint_names_ = joint_names;
@@ -71,14 +73,14 @@ bool JointRelayHandler::internalCB(SimpleMessage& in)
 
 bool JointRelayHandler::internalCB(JointMessage& in)
 {
-  control_msgs::FollowJointTrajectoryFeedback control_state;
-  sensor_msgs::JointState sensor_state;
+  control_msgs::action::FollowJointTrajectory_Feedback control_state;
+  sensor_msgs::msg::JointState sensor_state;
   bool rtn = true;
 
   if (create_messages(in, &control_state, &sensor_state))
   {
-    this->pub_joint_control_state_.publish(control_state);
-    this->pub_joint_sensor_state_.publish(sensor_state);
+    this->pub_joint_control_state_->publish(control_state);
+    this->pub_joint_sensor_state_->publish(sensor_state);
   }
   else
     rtn = false;
@@ -96,8 +98,8 @@ bool JointRelayHandler::internalCB(JointMessage& in)
 
 // TODO: Add support for other message fields (velocity, effort, desired pos)
 bool JointRelayHandler::create_messages(JointMessage& msg_in,
-                                        control_msgs::FollowJointTrajectoryFeedback* control_state,
-                                        sensor_msgs::JointState* sensor_state)
+                                        control_msgs::action::FollowJointTrajectory_Feedback* control_state,
+                                        sensor_msgs::msg::JointState* sensor_state)
 {
   // read joint positions from JointMessage
   std::vector<double> all_joint_pos(all_joint_names_.size());
@@ -128,13 +130,13 @@ bool JointRelayHandler::create_messages(JointMessage& msg_in,
   }
 
   // assign values to messages
-  control_msgs::FollowJointTrajectoryFeedback tmp_control_state;  // always start with a "clean" message
+  control_msgs::action::FollowJointTrajectory_Feedback tmp_control_state;  // always start with a "clean" message
   tmp_control_state.header.stamp = rclcpp::Clock(RCL_ROS_TIME).now();
   tmp_control_state.joint_names = pub_joint_names;
   tmp_control_state.actual.positions = pub_joint_pos;
   *control_state = tmp_control_state;
 
-  sensor_msgs::JointState tmp_sensor_state;
+  sensor_msgs::msg::JointState tmp_sensor_state;
   tmp_sensor_state.header.stamp = tmp_control_state.header.stamp;
   tmp_sensor_state.name = pub_joint_names;
   tmp_sensor_state.position = pub_joint_pos;

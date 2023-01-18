@@ -87,9 +87,10 @@ protected:
 
   std::vector<std::string> all_joint_names_;
 
-  ros::Publisher pub_joint_control_state_;
-  ros::Publisher pub_joint_sensor_state_;
-  ros::NodeHandle node_;
+  rclcpp::Publisher<control_msgs::action::FollowJointTrajectory_Feedback>::SharedPtr pub_joint_control_state_;
+  rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr pub_joint_sensor_state_;
+
+  std::shared_ptr<rclcpp::Node> node_;
 
   /**
    * \brief Convert joint message into publish message-types
@@ -101,8 +102,8 @@ protected:
    * \return true on success, false otherwise
    */
   virtual bool create_messages(JointMessage& msg_in,
-                               control_msgs::FollowJointTrajectoryFeedback* control_state,
-                               sensor_msgs::JointState* sensor_state);
+                               control_msgs::action::FollowJointTrajectory_Feedback* control_state,
+                               sensor_msgs::msg::JointState* sensor_state);
 
   /**
    * \brief Transform joint positions before publishing.

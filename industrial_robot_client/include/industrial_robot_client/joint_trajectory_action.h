@@ -85,7 +85,7 @@ private:
   /**
    * \brief Internal ROS node handle
    */
-  ros::NodeHandle node_;
+  std::shared_ptr<rclcpp::Node> node_;
 
   /**
    * \brief Internal action server

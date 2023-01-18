@@ -75,7 +75,7 @@ public:
 protected:
 
   rclcpp::Publisher pub_robot_status_;
-  rclcpp::NodeHandle node_;
+  std::shared_ptr<rclcpp::Node> node_;
 
   /**
    * \brief Callback executed upon receiving a robot status message
