@@ -32,10 +32,8 @@
 #ifndef LOG_WRAPPER_H_
 #define LOG_WRAPPER_H_
 
-// remove ROS after Melodic (bw compat for #262)
-#if defined(SIMPLE_MESSAGE_USE_ROS) || defined(ROS)
-#include "ros/ros.h"
-#endif
+//#include "ros/ros.h"
+#include "rclcpp/rclcpp.hpp"
 
 #ifdef SIMPLE_MESSAGE_MOTOPLUS
 #include "motoPlus.h"
@@ -83,6 +81,11 @@ namespace log_wrapper
   ROS_FATAL(__VA_ARGS__)
 
 #else
+
+#define ROS_DEBUG RCUTILS_LOG_DEBUG
+#define ROS_ERROR RCUTILS_LOG_ERROR
+#define ROS_WARN RCUTILS_LOG_WARN
+#define ROS_INFO RCUTILS_LOG_INFO
 
 #define LOG_COMM(format, ...)  \
   ROS_DEBUG(format, ##__VA_ARGS__)

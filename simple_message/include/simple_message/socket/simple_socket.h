@@ -32,6 +32,10 @@
 #ifndef SIMPLE_SOCKET_H
 #define SIMPLE_SOCKET_H
 
+#if defined(__linux__) && !defined(SIMPLE_MESSAGE_LINUX)
+#define SIMPLE_MESSAGE_LINUX 1
+#endif
+
 #ifndef FLATHEADERS
 #include "simple_message/log_wrapper.h"
 #include "simple_message/shared_types.h"
