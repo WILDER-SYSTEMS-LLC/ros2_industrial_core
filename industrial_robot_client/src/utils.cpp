@@ -29,13 +29,16 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "ros/console.h"
+//#include "ros/console.h"
 
 #include "industrial_utils/utils.h"
 #include "industrial_robot_client/utils.h"
 
 #include <cmath>
 #include <iostream>
+
+// Because ROS2 completely changed this stuff
+#define ROS_ERROR_STREAM(x) 
 
 namespace industrial_robot_client
 {

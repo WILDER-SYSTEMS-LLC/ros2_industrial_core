@@ -30,7 +30,7 @@
  */
 
 #include "industrial_robot_client/robot_status_relay_handler.h"
-#include "industrial_msgs/RobotStatus.h"
+#include "industrial_msgs/msg/robot_status.hpp"
 #include "simple_message/log_wrapper.h"
 
 using namespace industrial::shared_types;

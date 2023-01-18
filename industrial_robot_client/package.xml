@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
-<package format="2">
+<package format="3">
   <name>industrial_robot_client</name>
   <version>0.7.3</version>
   <description>industrial robot client contains generic clients for connecting 
@@ -13,7 +13,10 @@
   <license>BSD</license>
   <url type="website">http://ros.org/wiki/industrial_robot_client</url>
 
-  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>rosidl_default_generators</buildtool_depend>
+  <exec_depend>rosidl_default_runtime</exec_depend>
+  <member_of_group>rosidl_interface_packages</member_of_group>
+
 
   <depend>actionlib_msgs</depend>
   <depend>actionlib</depend>
@@ -34,4 +37,9 @@
 
   <test_depend>roslaunch</test_depend>
   <test_depend>rosunit</test_depend>
+
+    <export>
+  <build_type>ament_cmake</build_type>
+  </export>
+
 </package>

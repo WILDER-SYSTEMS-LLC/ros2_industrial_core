@@ -36,9 +36,9 @@
 #include <string>
 #include <vector>
 
-#include "ros/ros.h"
-#include "control_msgs/FollowJointTrajectoryFeedback.h"
-#include "sensor_msgs/JointState.h"
+#include "rclcpp/rclcpp.hpp"
+#include "control_msgs/action/follow_joint_trajectory.hpp"
+#include "sensor_msgs/msg/joint_state.hpp"
 #include "simple_message/message_handler.h"
 #include "simple_message/messages/joint_message.h"
 

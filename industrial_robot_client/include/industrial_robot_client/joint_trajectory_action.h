@@ -32,12 +32,19 @@
 #ifndef JOINT_TRAJTORY_ACTION_H
 #define JOINT_TRAJTORY_ACTION_H
 
-#include <ros/ros.h>
-#include <actionlib/server/action_server.h>
+#include <rclcpp/rclcpp.hpp>
 
-#include <trajectory_msgs/JointTrajectory.h>
-#include <control_msgs/FollowJointTrajectoryAction.h>
-#include <control_msgs/FollowJointTrajectoryFeedback.h>
+// Need to rewrite actionlib calls anyway
+// #include <actionlib/server/action_server.h>
+
+//#include <trajectory_msgs/JointTrajectory.h>
+#include <trajectory_msgs/msg/joint_trajectory.hpp>
+
+// #include <control_msgs/FollowJointTrajectoryAction.h>
+// #include <control_msgs/FollowJointTrajectoryFeedback.h>
+#include <control_msgs/action/follow_joint_trajectory.hpp>
+
+
 #include <industrial_msgs/RobotStatus.h>
 
 namespace industrial_robot_client
