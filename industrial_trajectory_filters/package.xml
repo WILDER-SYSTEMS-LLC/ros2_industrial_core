@@ -21,11 +21,13 @@
   <url type="bugtracker">https://github.com/ros-industrial/industrial_core/issues</url>
   <url type="repository">https://github.com/ros-industrial/industrial_core</url>
 
-  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>rosidl_default_generators</buildtool_depend>
 
-  <build_depend condition="$ROS_DISTRO == noetic">liborocos-kdl-dev</build_depend>
-  <build_export_depend condition="$ROS_DISTRO == noetic">liborocos-kdl-dev</build_export_depend>
-  <exec_depend condition="$ROS_DISTRO == noetic">liborocos-kdl</exec_depend>
+
+  <build_depend liborocos-kdl-dev</build_depend>
+  <build_export_depend liborocos-kdl-dev</build_export_depend>
+  <exec_depend liborocos-kdl</exec_depend>
 
   <depend>class_loader</depend>
   <depend>moveit_core</depend>
@@ -35,6 +37,8 @@
   <depend>trajectory_msgs</depend>
 
   <export>	
+    <build_type>ament_cmake</build_type>
+
     <moveit_core plugin="${prefix}/planning_request_adapters_plugin_description.xml"/> 
   </export>
 </package>
