@@ -17,6 +17,10 @@ Main target to kill;
 
 industrial_robot_client   (needs LOTS of work)
 
+# GIT Branch
+
+The current main branch is called melodic-devel because thats what upstream default is.
+However, devel should actually happen on a ROS2-humble machine
 
 ## Building
 
