@@ -19,11 +19,13 @@
 
 
   <depend>actionlib_msgs</depend>
-  <depend>actionlib</depend>
+  <!-- FIXME not sure what ros2 is supposed to do about this. They changed things
+	  <depend>actionlib</depend>
+  -->
   <depend>control_msgs</depend>
   <depend>industrial_msgs</depend>
   <depend>industrial_utils</depend>
-  <depend>roscpp</depend>
+  <depend>rclcpp</depend>
   <depend>sensor_msgs</depend>
   <depend>simple_message</depend>
   <depend>std_msgs</depend>
@@ -35,8 +37,12 @@
        drag in UI dependencies where the rest of IRC doesn't need it -->
   <!-- <exec_depend>rviz</exec_depend> -->
 
-  <test_depend>roslaunch</test_depend>
-  <test_depend>rosunit</test_depend>
+  <!-- FIXME
+	  this doesnt handle depends on packages directly, so.... if you need it,
+	  apt install python3-rosunit python3-roslaunch
+          <test_depend>roslaunch</test_depend>
+	  <test_depend>rosunit</test_depend>
+   -->
 
     <export>
   <build_type>ament_cmake</build_type>

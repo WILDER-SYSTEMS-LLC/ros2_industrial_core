@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
-<package format="2">
+<package format="3">
   <name>industrial_core</name>
   <version>0.7.3</version>
   <description>ROS-Industrial core stack contains packages and libraries for supporing industrial systems</description>
@@ -10,7 +10,7 @@
   <license>BSD</license>
   <url type="website">http://ros.org/wiki/industrial_core</url>
   
-  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>ament_cmake</buildtool_depend>
 
   <exec_depend>simple_message</exec_depend>
   <exec_depend>industrial_msgs</exec_depend>
@@ -20,6 +20,8 @@
   <exec_depend>industrial_utils</exec_depend>
   <exec_depend>industrial_trajectory_filters</exec_depend>
 
+  <!-- FIXME this file is missing something to make rosdep happy.
+  it complains we need dep on catkin, to be a metapackage -->
   <export>
     <metapackage/>
   </export>
