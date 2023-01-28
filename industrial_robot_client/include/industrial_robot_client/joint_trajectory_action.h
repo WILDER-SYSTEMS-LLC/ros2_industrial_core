@@ -95,25 +95,25 @@ private:
   /**
    * \brief Publishes desired trajectory (typically to the robot driver)
    */
-  ros::Publisher pub_trajectory_command_;
+  rclcpp::Publisher<trajectory_msgs::JointTrajectory> pub_trajectory_command_;
 
   /**
    * \brief Subscribes to trajectory feedback (typically published by the
    * robot driver).
    */
-  ros::Subscriber sub_trajectory_state_;
+  rclcpp::Subscriber sub_trajectory_state_;
 
   /**
    * \brief Subscribes to the robot status (typically published by the
    * robot driver).
    */
-  ros::Subscriber sub_robot_status_;
+  rclcpp::Subscriber sub_robot_status_;
 
   /**
    * \brief Watchdog time used to fail the action request if the robot
    * driver is not responding.
    */
-  ros::Timer watchdog_timer_;
+  rclcpp::Timer watchdog_timer_;
 
   /**
     * \brief Controller was alive during the last watchdog interval

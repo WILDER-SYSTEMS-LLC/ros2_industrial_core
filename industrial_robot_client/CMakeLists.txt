@@ -20,16 +20,18 @@ find_package(actionlib_msgs REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system thread)
 
 # Shouldnt this be handled by find_package?? Guess not.
-include_directories(include trajectory_msgs)
+include_directories(include industrial_msgs trajectory_msgs)
 
 
-set(SRC_FILES src/joint_relay_handler.cpp
-              src/joint_trajectory_downloader.cpp
-              src/joint_trajectory_interface.cpp
-              src/joint_trajectory_streamer.cpp
-              src/robot_state_interface.cpp
-              src/robot_status_relay_handler.cpp
-              src/utils.cpp)
+set(SRC_FILES 
+	src/joint_relay_handler.cpp
+	src/joint_trajectory_downloader.cpp
+	src/joint_trajectory_interface.cpp
+	#FIXME             src/joint_trajectory_streamer.cpp
+	#FIXME              src/robot_state_interface.cpp
+	#FIXME              src/robot_status_relay_handler.cpp
+	             src/utils.cpp
+	)
 
 
 
@@ -39,13 +41,13 @@ add_library(${PROJECT_NAME} ${SRC_FILES})
 ## ament_target_dependencies(${PROJECT_NAME} ${FULL_DEPENCENCIES})
 ament_target_dependencies(${PROJECT_NAME} rclcpp
 	simple_message 
-	std_msgs 
-	control_msgs 
+	std_msgs         # base
+	control_msgs     # base
 	industrial_msgs
 	industrial_utils
-	sensor_msgs 
-	trajectory_msgs 
-	urdf 
+	sensor_msgs      # base
+	trajectory_msgs  # base
+	urdf             # base
 )
 
 #

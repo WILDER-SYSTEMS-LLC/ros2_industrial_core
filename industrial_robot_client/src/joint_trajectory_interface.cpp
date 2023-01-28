@@ -41,7 +41,7 @@ using industrial::simple_message::SimpleMessage;
 namespace StandardSocketPorts = industrial::simple_socket::StandardSocketPorts;
 namespace SpecialSeqValues = industrial::joint_traj_pt::SpecialSeqValues;
 typedef industrial::joint_traj_pt::JointTrajPt rbt_JointTrajPt;
-typedef trajectory_msgs::JointTrajectoryPoint  ros_JointTrajPt;
+typedef trajectory_msgs::msg::JointTrajectoryPoint  ros_JointTrajPt;
 
 namespace industrial_robot_client
 {
@@ -103,10 +103,18 @@ bool JointTrajectoryInterface::init(SmplMsgConnection* connection, const std::ve
   if (joint_vel_limits_.empty() && !industrial_utils::param::getJointVelocityLimits("robot_description", joint_vel_limits_))
     ROS_WARN("Unable to read velocity limits from 'robot_description' param.  Velocity validation disabled.");
 
-  this->srv_stop_motion_ = this->node_.advertiseService("stop_motion", &JointTrajectoryInterface::stopMotionCB, this);
-  this->srv_joint_trajectory_ = this->node_.advertiseService("joint_path_command", &JointTrajectoryInterface::jointTrajectoryCB, this);
-  this->sub_joint_trajectory_ = this->node_.subscribe("joint_path_command", 0, &JointTrajectoryInterface::jointTrajectoryCB, this);
-  this->sub_cur_pos_ = this->node_.subscribe("joint_states", 1, &JointTrajectoryInterface::jointStateCB, this);
+  auto srv_stop_motion_ = 
+    this->node_->create_service<industrial_msgs::srv::StopMotion::Request,industrial_msgs::srv::StopMotion::Response>(
+		    "stop_motion", &JointTrajectoryInterface::stopMotionCB);
+  auto srv_joint_trajectory_ = 
+    this->node_->create_service<industrial_msgs::srv::CmdJointTrajectory::Request,industrial_msgs::srv::CmdJointTrajectory::Response>(
+		    "joint_path_command", &JointTrajectoryInterface::jointTrajectoryCB);
+
+  this->node_->create_subscription<trajectory_msgs::msg::JointTrajectory::ConstPtr>(
+    ("joint_path_command", 0, &JointTrajectoryInterface::jointTrajectoryCB, this->node_, _1));
+
+  this->node_->create_subscription<sensor_msgs::msg::JointTrajectory::ConstPtr>(
+    ("joint_states", 1, &JointTrajectoryInterface::jointStateCB, this->node_, _1));
 
   return true;
 }
@@ -117,10 +125,10 @@ JointTrajectoryInterface::~JointTrajectoryInterface()
   this->sub_joint_trajectory_.shutdown();
 }
 
-bool JointTrajectoryInterface::jointTrajectoryCB(industrial_msgs::CmdJointTrajectory::Request &req,
-                                                 industrial_msgs::CmdJointTrajectory::Response &res)
+bool JointTrajectoryInterface::jointTrajectoryCB(industrial_msgs::srv::CmdJointTrajectory::Request &req,
+                                                 industrial_msgs::srv::CmdJointTrajectory::Response &res)
 {
-  trajectory_msgs::JointTrajectoryPtr traj_ptr(new trajectory_msgs::JointTrajectory);
+	trajectory_msgs::msg::JointTrajectoryPtr traj_ptr(new trajectory_msgs::msg::JointTrajectory);
   *traj_ptr = req.trajectory;  // copy message data
   this->jointTrajectoryCB(traj_ptr);
 
@@ -130,7 +138,7 @@ bool JointTrajectoryInterface::jointTrajectoryCB(industrial_msgs::CmdJointTrajec
   return true;  // always return true.  To distinguish between call-failed and service-unavailable.
 }
 
-void JointTrajectoryInterface::jointTrajectoryCB(const trajectory_msgs::JointTrajectoryConstPtr &msg)
+void JointTrajectoryInterface::jointTrajectoryCB(const trajectory_msgs::msg::JointTrajectory::ConstPtr &msg)
 {
   ROS_INFO("Receiving joint trajectory message");
 
@@ -151,7 +159,7 @@ void JointTrajectoryInterface::jointTrajectoryCB(const trajectory_msgs::JointTra
   send_to_robot(robot_msgs);
 }
 
-bool JointTrajectoryInterface::trajectory_to_msgs(const trajectory_msgs::JointTrajectoryConstPtr& traj, std::vector<JointTrajPtMessage>* msgs)
+bool JointTrajectoryInterface::trajectory_to_msgs(const trajectory_msgs::msg::JointTrajectory::ConstPtr& traj, std::vector<JointTrajPtMessage>* msgs)
 {
   msgs->clear();
 
@@ -223,7 +231,7 @@ bool JointTrajectoryInterface::select(const std::vector<std::string>& ros_joint_
   return true;
 }
 
-bool JointTrajectoryInterface::calc_speed(const trajectory_msgs::JointTrajectoryPoint& pt, double* rbt_velocity, double* rbt_duration)
+bool JointTrajectoryInterface::calc_speed(const trajectory_msgs::msg::JointTrajectoryPoint& pt, double* rbt_velocity, double* rbt_duration)
 {
 	return calc_velocity(pt, rbt_velocity) && calc_duration(pt, rbt_duration);
 }
@@ -234,7 +242,7 @@ bool JointTrajectoryInterface::calc_speed(const trajectory_msgs::JointTrajectory
 // NOTE: this calculation uses the maximum joint speeds from the URDF file, which may differ from those defined on
 // the physical robot.  These differences could lead to different actual movement velocities than intended.
 // Behavior should be verified on a physical robot if movement velocity is critical.
-bool JointTrajectoryInterface::calc_velocity(const trajectory_msgs::JointTrajectoryPoint& pt, double* rbt_velocity)
+bool JointTrajectoryInterface::calc_velocity(const trajectory_msgs::msg::JointTrajectoryPoint& pt, double* rbt_velocity)
 {
   std::vector<double> vel_ratios;
 
@@ -281,7 +289,7 @@ bool JointTrajectoryInterface::calc_velocity(const trajectory_msgs::JointTraject
   return true;
 }
 
-bool JointTrajectoryInterface::calc_duration(const trajectory_msgs::JointTrajectoryPoint& pt, double* rbt_duration)
+bool JointTrajectoryInterface::calc_duration(const trajectory_msgs::msg::JointTrajectoryPoint& pt, double* rbt_duration)
 {
   std::vector<double> durations;
   double this_time = pt.time_from_start.toSec();
@@ -326,8 +334,8 @@ void JointTrajectoryInterface::trajectoryStop()
   this->connection_->sendAndReceiveMsg(msg, reply);
 }
 
-bool JointTrajectoryInterface::stopMotionCB(industrial_msgs::StopMotion::Request &req,
-		                                    industrial_msgs::StopMotion::Response &res)
+bool JointTrajectoryInterface::stopMotionCB(industrial_msgs::srv::StopMotion::Request &req,
+		                                    industrial_msgs::srv::StopMotion::Response &res)
 {
   trajectoryStop();
 
@@ -337,11 +345,11 @@ bool JointTrajectoryInterface::stopMotionCB(industrial_msgs::StopMotion::Request
   return true;  // always return true.  To distinguish between call-failed and service-unavailable.
 }
 
-bool JointTrajectoryInterface::is_valid(const trajectory_msgs::JointTrajectory &traj)
+bool JointTrajectoryInterface::is_valid(const trajectory_msgs::msg::JointTrajectory &traj)
 {
   for (int i=0; i<traj.points.size(); ++i)
   {
-    const trajectory_msgs::JointTrajectoryPoint &pt = traj.points[i];
+    const trajectory_msgs::msg::JointTrajectoryPoint &pt = traj.points[i];
 
     // check for non-empty positions
     if (pt.positions.empty())
@@ -366,7 +374,7 @@ bool JointTrajectoryInterface::is_valid(const trajectory_msgs::JointTrajectory &
 }
 
 // copy robot JointState into local cache
-void JointTrajectoryInterface::jointStateCB(const sensor_msgs::JointStateConstPtr &msg)
+void JointTrajectoryInterface::jointStateCB(const sensor_msgs::msg::JointTrajectory::ConstPtr &msg)
 {
   this->cur_joint_pos_ = *msg;
 }

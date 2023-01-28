@@ -81,7 +81,9 @@ void JointTrajectoryStreamer::jointTrajectoryCB(const trajectory_msgs::JointTraj
   // would be "IDLE", and we'd end up not sending the stop request.
   if (msg->points.empty())
   {
-    ROS_INFO_STREAM("Empty trajectory received while in state: " << TransferStates::to_string(state) << ". Canceling current trajectory.");
+	  // quick port hack
+    // ROS_INFO_STREAM("Empty trajectory received while in state: " << TransferStates::to_string(state) << ". Canceling current trajectory.");
+    ROS_INFO("Empty trajectory received. Canceling current trajectory.");
     this->mutex_.lock();
     trajectoryStop();
     this->mutex_.unlock();
@@ -149,16 +151,18 @@ void JointTrajectoryStreamer::streamingThread()
   int connectRetryCount = 1;
 
   ROS_INFO("Starting joint trajectory streamer thread");
-  while (ros::ok())
+  while (rclcpp::ok())
   {
-    ros::Duration(0.005).sleep();
-
+    // rclcpp::sleep_for(rclcpp::Duration(0.05).to_crono());
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    //
     // automatically re-establish connection, if required
     if (connectRetryCount-- > 0)
     {
       ROS_INFO("Connecting to robot motion server");
       this->connection_->makeConnect();
-      ros::Duration(0.250).sleep();  // wait for connection
+      // rclcpp::sleep_for(rclcpp::Duration(0.250).to_chrono();  // wait for connection
+      std::this_thread::sleep_for(std::chrono::milliseconds(250));
 
       if (this->connection_->isConnected())
         connectRetryCount = 0;
@@ -177,7 +181,7 @@ void JointTrajectoryStreamer::streamingThread()
     switch (this->state_)
     {
       case TransferStates::IDLE:
-        ros::Duration(0.010).sleep();  //  loop while waiting for new trajectory
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
         break;
 
       case TransferStates::STREAMING:

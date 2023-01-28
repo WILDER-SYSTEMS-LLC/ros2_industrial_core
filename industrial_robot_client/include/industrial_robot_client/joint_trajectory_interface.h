@@ -140,7 +140,7 @@ protected:
    *
    * \return true on success, false otherwise
    */
-  virtual bool trajectory_to_msgs(const trajectory_msgs::msg::JointTrajectoryConstPtr &traj, std::vector<JointTrajPtMessage>* msgs);
+  virtual bool trajectory_to_msgs(const trajectory_msgs::msg::JointTrajectory::ConstPtr &traj, std::vector<JointTrajPtMessage>* msgs);
 
   /**
    * \brief Transform joint positions before publishing.
@@ -221,7 +221,7 @@ protected:
    *
    * \param msg JointTrajectory message from ROS trajectory-planner
    */
-  virtual void jointTrajectoryCB(const trajectory_msgs::msg::JointTrajectoryConstPtr &msg);
+  virtual void jointTrajectoryCB(const trajectory_msgs::msg::JointTrajectory::ConstPtr &msg);
 
   /**
    * \brief Callback function registered to ROS stopMotion service
@@ -247,16 +247,18 @@ protected:
    *
    * \param msg JointState message
    */
-  virtual void jointStateCB(const sensor_msgs::msg::JointStateConstPtr &msg);
+  virtual void jointStateCB(const sensor_msgs::msg::JointState::ConstPtr &msg);
 
   TcpClient default_tcp_connection_;
 
   std::shared_ptr<rclcpp::Node> node_;
   SmplMsgConnection* connection_;
-  ros::Subscriber sub_cur_pos_;  // handle for joint-state topic subscription
-  ros::Subscriber sub_joint_trajectory_; // handle for joint-trajectory topic subscription
-  ros::ServiceServer srv_joint_trajectory_;  // handle for joint-trajectory service
-  ros::ServiceServer srv_stop_motion_;   // handle for stop_motion service
+  // Doesnt seem to be be a reason to save these here
+  // ros::Subscriber sub_cur_pos_;  // handle for joint-state topic subscription
+  // ros::Subscriber sub_joint_trajectory_; // handle for joint-trajectory topic subscription
+  // ros::ServiceServer srv_joint_trajectory_;  // handle for joint-trajectory service
+  // ros::ServiceServer srv_stop_motion_;   // handle for stop_motion service
+  //
   std::vector<std::string> all_joint_names_;
   double default_joint_pos_;  // default position to use for "dummy joints", if none specified
   double default_vel_ratio_;  // default velocity ratio to use for joint commands, if no velocity or max_vel specified

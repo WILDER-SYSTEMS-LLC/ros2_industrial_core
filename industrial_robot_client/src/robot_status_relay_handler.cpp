@@ -65,10 +65,10 @@ bool RobotStatusRelayHandler::internalCB(SimpleMessage& in)
 
 bool RobotStatusRelayHandler::internalCB(RobotStatusMessage & in)
 {
-	industrial_msgs::msg::RobotStatus status;
+  industrial_msgs::RobotStatus status;
   bool rtn = true;
 
-  status.header.stamp = rclcpp::Clock(RCL_ROS_TIME).now();
+  status.header.stamp = ros::Time::now();
   status.drives_powered.val = TriStates::toROSMsgEnum(in.status_.getDrivesPowered());
   status.e_stopped.val = TriStates::toROSMsgEnum(in.status_.getEStopped());
   status.error_code = in.status_.getErrorCode();

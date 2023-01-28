@@ -10,6 +10,7 @@
 #define ROS_DEBUG RCUTILS_LOG_DEBUG
 #define ROS_ERROR RCUTILS_LOG_ERROR
 #define ROS_WARN RCUTILS_LOG_WARN
+#define ROS_WARN_ONCE RCUTILS_LOG_WARN_ONCE
 #define ROS_INFO RCUTILS_LOG_INFO
 
 // rcutils/assert.h is suposedly coming but not here yet
