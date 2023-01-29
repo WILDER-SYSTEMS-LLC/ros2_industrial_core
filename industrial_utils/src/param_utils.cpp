@@ -33,18 +33,19 @@
 
 #include "industrial_utils/param_utils.h"
 #include "industrial_utils/utils.h"
-//#include "ros/ros.h"
-#include "rclcpp/rclcpp.hpp"
+
 
 
 // This is cribbed from 
 // https://github.com/ros2/rclcpp/blob/rolling/rclcpp/test/rclcpp/test_logging.cpp
 
+/* not used 
 #include "rclcpp/logging.hpp"
 rclcpp::Logger g_logger = rclcpp::get_logger("name");
 #define ROS_INFO_STREAM(x) RCLCPP_INFO_STREAM(g_logger,x)
 #define ROS_WARN_STREAM(x) RCLCPP_WARN_STREAM(g_logger,x)
 #define ROS_ERROR_STREAM(x) RCLCPP_ERROR_STREAM(g_logger,x)
+*/
 
 #include <urdf/urdfdom_compatibility.h>
 
@@ -52,16 +53,24 @@ namespace industrial_utils
 {
 namespace param
 {
+
+  // This is primarily called by getJointNames?
 	// Get value of named parameter if exists?
-	// Then push it onto the provided listt
-bool getListParam(const std::string param_name, std::vector<std::string> & list_param)
+	// Then push it onto the provided list
+  // ros2 doesnt support static ros::param::get any more. We have to have
+  // a node instance pointer to work with.
+bool getListParam(rclcpp::Node::SharedPtr nodeptr, const std::string param_name, 
+  std::vector<std::string> & list_param)
 {
   bool rtn = false;
-  rclcpp::Parameter value = this->get_parameter(param_name);
-  rtn = (value.get_type_name() == "std::string");
-
-
   //rtn = ros::param::get(param_name, rpc_list);
+
+  rclcpp::Parameter value;
+  rtn = nodeptr ->get_parameter(param_name, value);
+
+  // Original had to deal with the old style param "rpc_list"
+  // with mandatory list parsing for the arg you want?
+  // New style just lets you directly ask for the param by name
 
   if (rtn)
   {
@@ -70,7 +79,7 @@ bool getListParam(const std::string param_name, std::vector<std::string> & list_
   }
   else
   {
-    ROS_ERROR_STREAM("Failed to get parameter: " << param_name);
+    RCLCPP_ERROR_STREAM(nodeptr->get_logger(),"Failed to get parameter: " << param_name);
   }
 
   return rtn;
@@ -86,48 +95,61 @@ std::string vec2str(const std::vector<std::string> &vec)
   return "[" + s.erase(s.length()-2) + "]";
 }
 
-bool getJointNames(const std::string joint_list_param, const std::string urdf_param,
-		           std::vector<std::string> & joint_names)
+bool getJointNames(rclcpp::Node::SharedPtr nodeptr, const std::string joint_list_param, 
+                   const std::string urdf_param_name,
+		               std::vector<std::string> & joint_names)
 {
   joint_names.clear();
 
   // 1) Try to read explicit list of joint names
   if (// ros::param::has(joint_list_param) &&
-       getListParam(joint_list_param, joint_names))
+       getListParam(nodeptr, joint_list_param, joint_names))
   {
-    ROS_INFO_STREAM("Found user-specified joint names in '" << joint_list_param << "': " << vec2str(joint_names));
+    RCLCPP_INFO_STREAM(nodeptr->get_logger(), 
+                       "Found user-specified joint names in '" << joint_list_param << "': " << vec2str(joint_names));
     return true;
   }
   else
-    ROS_WARN_STREAM("Unable to find user-specified joint names in '" << joint_list_param << "'");
+    RCLCPP_WARN_STREAM(nodeptr->get_logger(), 
+                       "Unable to find user-specified joint names in '" << joint_list_param << "'");
 
-  // 2) Try to find joint names from URDF model
+  rclcpp::Parameter urdf_params;
+  // 2) Try to find joint names from URDF mode
+  // Note: ROS2 only has urdf::Model::initFile and initString, 
+  // NOT initParam
+  // So maybe this option has to go away, dunno.
+  // Or maybe it needs to be the name of an URDF file instead of whatever it was before.
   urdf::Model model;
-  if ( //ros::param::has(urdf_param)
-       //&& 
-       model.initParam(urdf_param)
+  if ( nodeptr-> get_parameter(urdf_param_name, urdf_params)
+       && model.initString(urdf_params.as_string())
        && findChainJointNames(model.getRoot(), true, joint_names) )
   {
-    ROS_INFO_STREAM("Using joint names from URDF: '" << urdf_param << "': " << vec2str(joint_names));
+    RCLCPP_INFO_STREAM(nodeptr->get_logger(), 
+                       "Using joint names from URDF: '" << urdf_params << "': " << vec2str(joint_names));
     return true;
   }
   else
-    ROS_WARN_STREAM("Unable to find URDF joint names in '" << urdf_param << "'");
+    RCLCPP_WARN_STREAM(nodeptr->get_logger(), 
+                       "Unable to find URDF joint names in '" << urdf_param_name << "'");
 
   // 3) Raise an error
-  ROS_ERROR_STREAM(
-      "Cannot find user-specified joint names. Tried ROS parameter '" << joint_list_param << "'"
-      << " and the URDF in '" << urdf_param << "'.");
+  RCLCPP_ERROR_STREAM(nodeptr->get_logger(), 
+                      "Cannot find user-specified joint names. Tried ROS parameter '" << joint_list_param << "'"
+      << " and the URDF in '" << urdf_param_name << "'.");
   return false;
 }
 
-bool getJointVelocityLimits(const std::string urdf_param_name, std::map<std::string, double> &velocity_limits)
+bool getJointVelocityLimits(rclcpp::Node::SharedPtr nodeptr, 
+                            const std::string urdf_param_name, 
+                            std::map<std::string, double> &velocity_limits)
 {
+  rclcpp::Parameter urdf_params;
   urdf::Model model;
   std::map<std::string, urdf::JointSharedPtr >::iterator iter;
 
-  if (//!ros::param::has(urdf_param_name) || 
-		  !model.initParam(urdf_param_name))
+  // Note: ROS2 does not have urdf:Model::initParam any more
+  if (nodeptr-> get_parameter(urdf_param_name, urdf_params) || 
+		  !model.initString(urdf_params.as_string()))
     return false;
     
   velocity_limits.clear();

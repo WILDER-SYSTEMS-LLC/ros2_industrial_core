@@ -6,15 +6,15 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(urdf REQUIRED)
 
-find_package(Boost REQUIRED COMPONENTS system)
+##find_package(Boost REQUIRED COMPONENTS system)
 
 include_directories(include)
 
-#add_library(${PROJECT_NAME} src/param_utils.cpp src/utils.cpp)
+add_library(${PROJECT_NAME} src/param_utils.cpp src/utils.cpp)
 
 ## ROS2 totally changed how parameter passing is done.
 ## So just skip the param parsing utils for now. FIXME
-add_library(${PROJECT_NAME} src/utils.cpp)
+## add_library(${PROJECT_NAME} src/utils.cpp)
 
 ament_target_dependencies(${PROJECT_NAME} rclcpp urdf)
 

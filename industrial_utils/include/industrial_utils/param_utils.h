@@ -37,6 +37,8 @@
 #include <vector>
 #include <string>
 
+#include "rclcpp/rclcpp.hpp"
+
 namespace industrial_utils
 {
 namespace param
@@ -50,7 +52,7 @@ namespace param
  *
  * \return true if parameter
  */
-bool getListParam(const std::string param_name, std::vector<std::string> & list_param);
+bool getListParam(rclcpp::Node::SharedPtr nodeptr, const std::string param_name, std::vector<std::string> & list_param);
 
 /**
  * \brief Tries to get a set of joint names using several fallback methods:
@@ -64,18 +66,20 @@ bool getListParam(const std::string param_name, std::vector<std::string> & list_
  *
  * \return true if parameter found, false if defaults used
  */
-bool getJointNames(const std::string joint_list_param, const std::string urdf_param,
+bool getJointNames(rclcpp::Node::SharedPtr nodeptr, const std::string joint_list_param, 
+                   const std::string urdf_param,
 		           std::vector<std::string> & joint_names);
 
 /**
  * \brief Tries to read joint velocity limits from the specified URDF parameter
  *
  * \param[in] urdf_param_name name of URDF parameter
+   (currently expects urdf string)
  * \param[out] velocity_limits map of velocity limits for each URDF joint
  *
  * \return true if parameter found, false if not found
  */
-bool getJointVelocityLimits(const std::string urdf_param_name, std::map<std::string, double> &velocity_limits);
+bool getJointVelocityLimits(rclcpp::Node::SharedPtr nodeptr, const std::string urdf_param_name, std::map<std::string, double> &velocity_limits);
 
 } //industrial_utils::param
 } //industrial_utils
