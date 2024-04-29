@@ -41,6 +41,8 @@ include_directories(include
 set(ROS_BUILD_STATIC_LIBS true)
 set(ROS_BUILD_SHARED_LIBS false)
 
+add_definitions(-DBYTE_SWAPPING)
+
 #catkin_lint: ignore_once literal_project_name
 set(SRC_FILES src/byte_array.cpp
 	src/simple_message.cpp
