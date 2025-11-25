@@ -105,12 +105,17 @@ bool TcpClient::makeConnect()
   int rc = CONNECT(this->getSockHandle(), (sockaddr *)&sockaddr_, sizeof(sockaddr_));
   if (SOCKET_FAIL == rc)
   {
-    logSocketError("Failed to connect to server", rc, errno);
+    if (!logged_disconnect_)
+    {
+      logSocketError("Failed to connect to server", rc, errno);
+      logged_disconnect_ = true;
+    }
     return false;
   }
 
   LOG_INFO("Connected to server");
   setConnected(true);
+  logged_disconnect_ = false;
 
   return true;
 }
