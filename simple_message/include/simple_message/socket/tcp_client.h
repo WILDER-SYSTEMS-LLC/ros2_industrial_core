@@ -79,6 +79,7 @@ public:
 
 private:
     bool connectSocketHandle();
+    bool logged_disconnect_ = false;
 
 
 };
